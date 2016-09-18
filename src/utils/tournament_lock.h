@@ -6,12 +6,12 @@
 
 namespace utils {
 
-template <std::size_t LEVEL_NUM, std::size_t THREAD_NUM> class TournamentLock {
+template <std::size_t LEVEL_NUM, std::size_t THREAD_CAPACITY> class TournamentLock {
  public:
   void Lock(const std::size_t& thread_id,
             std::size_t& node_id,
             std::array<std::size_t, LEVEL_NUM>& level_id) {
-    node_id = thread_id + THREAD_NUM - 1;
+    node_id = thread_id + THREAD_CAPACITY - 1;
     for (std::size_t level = 0; level < LEVEL_NUM; level++) {
       level_id.at(level) = (node_id + 1) % 2;
       node_id = (node_id - 1) / 2;
@@ -28,7 +28,7 @@ template <std::size_t LEVEL_NUM, std::size_t THREAD_NUM> class TournamentLock {
   }
 
  private:
-  std::array<PetersonLock, THREAD_NUM - 1> nodes_;
+  std::array<PetersonLock, THREAD_CAPACITY - 1> nodes_;
 };
 
 } // namespace utils
