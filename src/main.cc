@@ -22,6 +22,11 @@ int main(int argc, char* argv[]) {
   }
 
   {
+    utils::PetersonTester a(2, loop_num);
+    a.Test();
+  }
+
+  {
     utils::TASTester<utils::TASLock> a(thread_num, loop_num);
     a.Test();
   }

@@ -14,10 +14,10 @@ class PetersonLock {
   }
 
   void Lock(std::size_t id) {
-    std::atomic_exchange_explicit(&flag_[id], true, std::memory_order_acq_rel);
-    std::atomic_store_explicit(&victim_, id, std::memory_order_release);
+    std::atomic_store_explicit(&flag_[id], true, std::memory_order_relaxed);
+    std::atomic_exchange_explicit(&victim_, id, std::memory_order_acq_rel);
     while (std::atomic_load_explicit(&flag_[1 - id], std::memory_order_acquire) &&
-           std::atomic_load_explicit(&victim_, std::memory_order_acquire) == id) {}
+           std::atomic_load_explicit(&victim_, std::memory_order_relaxed) == id) {}
   }
 
   void Unlock(const std::size_t& id) {

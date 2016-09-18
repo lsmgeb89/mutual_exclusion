@@ -70,7 +70,32 @@ template <typename LockType> class TASTester : public BaseTester {
   LockType lock_;
 };
 
-template <std::size_t LEVEL_NUM> class TourTester : public BaseTester{
+class PetersonTester : public BaseTester {
+ public:
+  PetersonTester(const std::size_t& thread_num,
+                 const std::size_t& loop_num)
+    : BaseTester(thread_num, loop_num) {}
+
+ private:
+  void CreateThreads(void) override {
+    for (std::size_t id = 0; id < this->thread_num_; ++id) {
+      this->thread_pool.emplace_back([this, id] { this->Add(id); });
+    }
+  }
+
+  void Add(const std::size_t& id) {
+    for (uint64_t i = 0; i < this->loop_num_; ++i) {
+      lock_.Lock(id);
+      ++this->counter_;
+      lock_.Unlock(id);
+    }
+  }
+
+ private:
+  utils::PetersonLock lock_;
+};
+
+template <std::size_t LEVEL_NUM> class TourTester : public BaseTester {
  public:
   TourTester(const std::size_t& thread_num,
              const std::size_t& loop_num)
