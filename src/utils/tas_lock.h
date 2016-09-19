@@ -2,6 +2,7 @@
 #define LOCK_COMPARE_TAS_LOCK_H_
 
 #include <atomic>
+#include <string>
 
 namespace utils {
 
@@ -17,6 +18,9 @@ class TASLock {
   void Unlock(void) {
     lock_.clear(std::memory_order_release);
   }
+
+ public:
+  static constexpr auto name_ = "TASLock";
 
  private:
   std::atomic_flag lock_;

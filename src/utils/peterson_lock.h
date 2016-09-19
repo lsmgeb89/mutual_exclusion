@@ -24,6 +24,9 @@ class PetersonLock {
     std::atomic_store_explicit(&flag_[id], false, std::memory_order_release);
   }
 
+ public:
+  static constexpr auto name_ = "PetersonLock";
+
  private:
   std::atomic<bool> flag_[2];
   std::atomic<std::size_t> victim_;

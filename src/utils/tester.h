@@ -13,9 +13,11 @@ namespace utils {
 
 class BaseTester {
  public:
-  BaseTester(const std::size_t& thread_num,
+  BaseTester(const std::string& lock_name,
+             const std::size_t& thread_num,
              const std::size_t& loop_num)
-    : counter_(0),
+    : lock_name_(lock_name),
+      counter_(0),
       thread_num_(thread_num),
       loop_num_(loop_num) {}
 
@@ -36,10 +38,12 @@ class BaseTester {
       throw std::runtime_error("Test failed");
     }
 
-    std::cout << "Thread = " << thread_num_ << ", Loop = " << loop_num_
+#ifndef NDEBUG
+    std::clog << "[" << lock_name_ << "] Thread = " << thread_num_ << ", Loop = " << loop_num_
               << ", Count = " << counter_ << ", Total Time = "
               << std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count()
               << " (ns)" << std::endl;
+#endif
 
     Reset();
 
@@ -54,6 +58,8 @@ class BaseTester {
  private:
   virtual void CreateThreads(void) = 0;
 
+ public:
+  std::string lock_name_;
  protected:
   uint64_t counter_;
   std::size_t thread_num_;
@@ -63,9 +69,10 @@ class BaseTester {
 
 template <typename LockType> class TASTester : public BaseTester {
  public:
-  TASTester(const std::size_t& thread_num,
+  TASTester(const std::string& lock_name,
+            const std::size_t& thread_num,
             const std::size_t& loop_num)
-    : BaseTester(thread_num, loop_num) {}
+    : BaseTester(lock_name, thread_num, loop_num) {}
 
  private:
   void CreateThreads(void) override {
@@ -86,11 +93,12 @@ template <typename LockType> class TASTester : public BaseTester {
   LockType lock_;
 };
 
+#ifndef NDEBUG
 class PetersonTester : public BaseTester {
  public:
   PetersonTester(const std::size_t& thread_num,
                  const std::size_t& loop_num)
-    : BaseTester(thread_num, loop_num) {}
+    : BaseTester(utils::PetersonLock::name_, thread_num, loop_num) {}
 
  private:
   void CreateThreads(void) override {
@@ -110,12 +118,13 @@ class PetersonTester : public BaseTester {
  private:
   utils::PetersonLock lock_;
 };
+#endif
 
 template <std::size_t LEVEL_NUM> class TourTester : public BaseTester {
  public:
   TourTester(const std::size_t& thread_num,
              const std::size_t& loop_num)
-    : BaseTester(thread_num, loop_num) {}
+    : BaseTester(utils::TournamentLock<LEVEL_NUM, 1 << LEVEL_NUM>::name_, thread_num, loop_num) {}
 
  private:
   void CreateThreads(void) override {
@@ -147,8 +156,8 @@ class Tester {
     : thread_num_(thread_num),
       loop_num_(loop_num),
       test_times_(test_times),
-      tas_tester_(thread_num, loop_num),
-      ttas_tester_(thread_num, loop_num),
+      tas_tester_(utils::TASLock::name_, thread_num, loop_num),
+      ttas_tester_(utils::TTASLock::name_, thread_num, loop_num),
       tour_tester_(thread_num, loop_num) {
     tas_result_.resize(thread_num);
     ttas_result_.resize(thread_num);
@@ -177,31 +186,41 @@ class Tester {
 
   std::string ResultToString(void) {
     std::stringstream out_stream;
-    for (auto item : tas_result_) {
-      out_stream << item.count() << ", ";
+
+    // parameter
+    out_stream << "Thread Number: 1 ~ " << thread_num_
+               << ", Loop Number: " << loop_num_
+               << ", test times: " << test_times_
+               << ", Tournament Tree Height: " << level_
+               << ", Time Unit: Nanosecond"
+               << std::endl;
+
+    // header
+    out_stream << "Thread Number, "
+               << tas_tester_.lock_name_ << ", "
+               << ttas_tester_.lock_name_ << ", "
+               << tour_tester_.lock_name_ << std::endl;
+
+    // line
+    for (std::size_t i = 0; i < thread_num_; i++) {
+      out_stream << i + 1 << ", "
+                 << tas_result_.at(i).count() << ", "
+                 << ttas_result_.at(i).count() << ", "
+                 << tour_result_.at(i).count() << std::endl;
     }
-    out_stream << std::endl;
-    for (auto item : ttas_result_) {
-      out_stream << item.count() << ", ";
-    }
-    out_stream << std::endl;
-    for (auto item : tour_result_) {
-      out_stream << item.count() << ", ";
-    }
-    out_stream << std::endl;
 
     return out_stream.str();
   }
 
  private:
-  static constexpr std::size_t level = 4;
+  static constexpr std::size_t level_ = 4;
   std::size_t thread_num_;
   std::size_t loop_num_;
   std::size_t test_times_;
 
   utils::TASTester<utils::TASLock> tas_tester_;
   utils::TASTester<utils::TTASLock> ttas_tester_;
-  utils::TourTester<level> tour_tester_;
+  utils::TourTester<level_> tour_tester_;
 
   std::vector<std::chrono::duration<double, std::nano>> tas_result_;
   std::vector<std::chrono::duration<double, std::nano>> ttas_result_;

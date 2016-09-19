@@ -27,6 +27,9 @@ template <std::size_t LEVEL_NUM, std::size_t THREAD_CAPACITY> class TournamentLo
     }
   }
 
+ public:
+  static constexpr auto name_ = "TournamentLock";
+
  private:
   std::array<PetersonLock, THREAD_CAPACITY - 1> nodes_;
 };

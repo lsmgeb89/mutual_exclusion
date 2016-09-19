@@ -23,6 +23,9 @@ class TTASLock {
     std::atomic_store_explicit(&lock_, false, std::memory_order_release);
   }
 
+ public:
+  static constexpr auto name_ = "TTASLock";
+
  private:
   std::atomic<bool> lock_;
 };
