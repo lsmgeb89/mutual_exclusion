@@ -196,7 +196,7 @@ class Tester {
                << std::endl;
 
     // header
-    out_stream << "Thread Number, "
+    out_stream << "ThreadNumber, "
                << tas_tester_.lock_name_ << ", "
                << ttas_tester_.lock_name_ << ", "
                << tour_tester_.lock_name_ << std::endl;

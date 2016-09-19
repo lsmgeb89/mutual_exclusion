@@ -13,8 +13,8 @@ fi
 mkdir -p "$RELEASE_FOLDER"/src
 # copy source files
 cp -ar src/* "$RELEASE_FOLDER"/src
-# copy readme.txt & build_run.sh
-cp readme.txt build_run.sh "$RELEASE_FOLDER"
+# copy readme and scripts
+cp readme.txt build_run.sh graph.r "$RELEASE_FOLDER"
 # package all files
 pushd "${HOME}" > /dev/null 2>&1
 zip -r "$RELEASE_ZIP" "$NAME"/*
