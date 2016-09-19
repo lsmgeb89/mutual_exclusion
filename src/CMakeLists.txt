@@ -17,6 +17,6 @@ add_executable(lock_compare
 target_include_directories(lock_compare PRIVATE utils)
 
 if(CMAKE_COMPILER_IS_GNUCXX)
-  target_compile_options(lock_compare PRIVATE -std=c++11)
+  target_compile_options(lock_compare PRIVATE -std=c++0x)
   target_link_libraries(lock_compare PRIVATE Threads::Threads)
 endif()

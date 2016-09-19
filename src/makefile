@@ -1,6 +1,6 @@
 CC=g++
 INC=-I./utils
-CFLAGS=-c -Wall -std=c++11 -D NDEBUG
+CFLAGS=-c -Wall -std=c++0x -D NDEBUG
 LDFLAGS=-pthread
 SOURCES=main.cc
 OBJECTS=$(SOURCES:.cc=.o)
