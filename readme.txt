@@ -8,5 +8,5 @@ Compile Steps by CMake (https://cmake.org/):
 4. make
 
 How to run:
-'path_to_lock_compare' 'thread_num' 'loop_num'
-(eg: ./lock_compare 16 1000000)
+'path_to_lock_compare' 'thread_num' 'loop_num' 'test_times'
+(eg: ./lock_compare 16 1000000 10)
