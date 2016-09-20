@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH -J lock_compare # job name
-#SBATCH -o lock_compare_result_%j.txt # output and error file name (%j=jobID)
+#SBATCH -o result-tacc-%j.txt # output and error file name (%j=jobID)
 #SBATCH -n 16 # total number of cpus requested
 #SBATCH -p development # queue -- normal, development, etc.
 #SBATCH -t 02:00:00 # run time (hh:mm:ss) - 2.0 hours

@@ -11,10 +11,11 @@ if [ -f "$RELEASE_ZIP" ]; then
 fi
 
 mkdir -p "$RELEASE_FOLDER"/src
+mkdir -p "$RELEASE_FOLDER"/report
 # copy source files
 cp -ar src/* "$RELEASE_FOLDER"/src
 # copy readme and scripts
-cp readme.txt build_run.sh graph.r "$RELEASE_FOLDER"
+cp readme.txt *_*.sh "$RELEASE_FOLDER"
 # package all files
 pushd "${HOME}" > /dev/null 2>&1
 zip -r "$RELEASE_ZIP" "$NAME"/*
