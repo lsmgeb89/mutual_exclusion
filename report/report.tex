@@ -7,6 +7,9 @@
 \usepackage{listings}
 \usepackage{courier}
 \usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage[export]{adjustbox}
 
 \setlength{\parskip}{1em}
 
@@ -30,7 +33,7 @@ The experiment is intended to compare performance of three different kind of loc
 \section*{Experiment Method}
 For each lock ($l$), I launch multiple threads ($n$) to increase a shared variable concurrently.
 In each thread, it loops multiple times ($c$).
-These threads use one single lock to enter and leave critical section. In the thread running function, there are just simply calling \lstinline{Lock()}, adding shared variable by one and calling \lstinline{Unlock()} and loop it by $c$ times.
+These threads use one single lock to enter and leave critical section. In the thread running function, there are just simply calling \lstinline{Lock()}, adding shared variable by one and calling \lstinline{Unlock()} and looping them by $c$ times.
 A high accurate timer is used to calculate the total time from starting of these threads to end of these threads.
 I call the procedure above a test unit for $l$ lock, $n$ threads and $c$ loop times, denoted by $tu(l, n, c)$.
 The result of a test unit is total running time of these threads in nanoseconds.
@@ -48,12 +51,12 @@ The program called \lstinline{lock_compare} could receive three parameters: $n$,
 
 Basically, for each lock, I implement a class and expose two public functions \lstinline{Lock} and \lstinline{Unlock}.
 For example, \lstinline{class TASLock} for TAS, \lstinline{class TTASLock} for TTAS.
-Because Tournament lock uses a tree structure in which each node is a Peterson lock, there are two classes for implementing it: \lstinline{class PetersonLock} and \lstinline{class TournamentLock}.
+Because Tournament lock uses a binary tree structure in which each node is a Peterson lock, there are two classes for implementing it: \lstinline{class PetersonLock} and \lstinline{class TournamentLock}.
 For Tournament class, the current level is $4$.
 It is hard-coded in the source code by \lstinline{static constexpr std::size_t level_ = 4;}.
-In order to achieve mutual exclusion, I use \lstinline{C++11}'s \href{http://en.cppreference.com/w/cpp/atomic}{Atomic Operations Library} in the internal variables in each lock class.
+In order to achieve mutual exclusion, I use \lstinline{C++11}'s \href{http://en.cppreference.com/w/cpp/atomic}{Atomic Operations Library} for the types of the internal variables in each lock class.
 
-In terms of testing, I implement a base class called \lstinline{class BaseTester} to fill common logic for all tester.
+In terms of testing, I implement a base class called \lstinline{class BaseTester} filled with common logic for all tester.
 And nearly for each lock, there is a tester class that is inherited from \lstinline{class BaseTester}.
 In the end, there is a \lstinline{class Tester} as a only one entry for testing.
 It does all necessary tests by calling each tester and output result points.
@@ -65,5 +68,18 @@ After each unit test $tu(l, n, c)$, the shared variable should be equal to $n \c
 So checking this value after each unit test, if the condition is violated, I throw an exception and catch it in the top level to stop testing procedure because mutual exclusion is violated.
 
 \section*{Testing Environment and Experiment Results}
+Tests are done in the platform called \href{https://www.tacc.utexas.edu/}{TACC}.
+It is a distributed supercomputer clusters.
+I use one of visualization node to do the test.
+A visualization node have 2 Intel Xeon E5-2680 processors (16 total cores) and 32GB of memory.
+Command \lstinline{lock_compare 16 1000000 16} are used to launch testing.
+
+The plot below is the test result.
+We could clear see that the performance of three locks from slow to fast is Tournament, TAS, TTAS.
+
+\begin{figure}[H]
+  \includegraphics[scale=0.8]{result-tacc-7637283}
+  \caption{Test Result on TACC}
+\end{figure}
 
 \end{document}
