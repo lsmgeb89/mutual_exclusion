@@ -11,6 +11,12 @@
 
 namespace utils {
 
+class MutualExclusionViolation : public std::runtime_error {
+ public:
+  explicit MutualExclusionViolation(const std::string& err_str = "")
+    : std::runtime_error(err_str) {}
+};
+
 class BaseTester {
  public:
   BaseTester(const std::string& lock_name,
@@ -35,7 +41,7 @@ class BaseTester {
     auto end = std::chrono::steady_clock::now();
 
     if (counter_ != thread_num_ * loop_num_) {
-      throw std::runtime_error("Test failed");
+      throw MutualExclusionViolation();
     }
 
 #ifndef NDEBUG
@@ -124,7 +130,12 @@ template <std::size_t LEVEL_NUM> class TourTester : public BaseTester {
  public:
   TourTester(const std::size_t& thread_num,
              const std::size_t& loop_num)
-    : BaseTester(utils::TournamentLock<LEVEL_NUM, 1 << LEVEL_NUM>::name_, thread_num, loop_num) {}
+    : BaseTester(utils::TournamentLock<LEVEL_NUM, 1 << LEVEL_NUM>::name_, thread_num, loop_num) {
+    if (thread_num > (1 << LEVEL_NUM)) {
+      throw std::runtime_error("Thread number exceeds tournament lock's capacity (" +
+                               std::to_string(1 << LEVEL_NUM) + ")");
+    }
+  }
 
  private:
   void CreateThreads(void) override {

@@ -22,8 +22,10 @@ int main(int argc, char* argv[]) {
     utils::Tester t(thread_num, loop_num, test_times);
     t.Test();
     std::cout << t.ResultToString();
+  } catch (const utils::MutualExclusionViolation& err) {
+    std::cerr << "Mutual Exclusion Violated!" << std::endl;
   } catch (const std::runtime_error& err) {
-    std::cerr << "Mutual Exclusion failed!" << std::endl;
+    std::cerr << err.what() << std::endl;
   } catch (...) {
     std::cerr << "Internal Error!" << std::endl;
   }
