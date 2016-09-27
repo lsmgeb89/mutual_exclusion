@@ -12,11 +12,11 @@ class TASLock {
     : lock_(ATOMIC_FLAG_INIT) {}
 
   void Lock(void) {
-    while(lock_.test_and_set(std::memory_order_acquire));
+    while(lock_.test_and_set());
   }
 
   void Unlock(void) {
-    lock_.clear(std::memory_order_release);
+    lock_.clear();
   }
 
  public:

@@ -13,14 +13,14 @@ class TTASLock {
   void Lock(void) {
     while(true) {
       while(atomic_load(&lock_)) {};
-      if (!std::atomic_exchange_explicit(&lock_, true, std::memory_order_acquire)) {
+      if (!std::atomic_exchange(&lock_, true)) {
         break;
       }
     }
   }
 
   void Unlock(void) {
-    std::atomic_store_explicit(&lock_, false, std::memory_order_release);
+    std::atomic_store(&lock_, false);
   }
 
  public:
