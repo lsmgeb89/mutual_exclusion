@@ -74,8 +74,11 @@ I use one of visualization node to do the test.
 A visualization node have 2 Intel Xeon E5-2680 processors (16 total cores) and 32GB of memory.
 Command \lstinline{lock_compare 16 1000000 16} are used to launch testing.
 
-The plot below is the test result.
+The output data of program and plot generated below are the test results.
 We could clear see that the performance of three locks from slow to fast is TAS, Tournament, TTAS.
+TTAS is faster than TAS is in my expectation because TTAS spins on the variable in its own CPU's cache on the multiprocessor architecture so that cache miss flow is hugely decreased.
+
+\lstinputlisting{result-tacc-7654044.txt}
 
 \begin{figure}[H]
   \includegraphics[scale=0.8]{result-tacc-7654044}
